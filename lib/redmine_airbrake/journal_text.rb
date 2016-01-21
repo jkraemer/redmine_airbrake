@@ -1,3 +1,5 @@
+require 'pp'
+
 module RedmineAirbrake
   module JournalText
 
