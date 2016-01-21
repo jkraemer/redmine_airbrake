@@ -1,11 +1,15 @@
-Redmine Airbrake Plugin [![Build Status](https://travis-ci.org/jkraemer/redmine_airbrake.svg?branch=master)](https://travis-ci.org/jkraemer/redmine_airbrake) \_
+Redmine Airbrake Plugin [![Build Status](https://travis-ci.org/jkraemer/redmine_airbrake.svg?branch=master)](https://travis-ci.org/jkraemer/redmine_airbrake)
 ==============
 
-This plugin makes Redmine act like an [Airbrake](http://airbrake.io/) (formerly
-known as Hoptoad) server. All exceptions caught and sent by Airbrake client
-libraries will create or update an issue in Redmine.
+This plugin makes Redmine act like an [Airbrake](http://airbrake.io/)
+server. Any exceptions caught and sent by Airbrake client libraries will create
+or update an issue in Redmine.
 
-This plugin is a complete rewrite of the [redmine_hoptoad_server](https://github.com/jkraemer/redmine_hoptoad_server) plugin. It supports the Airbrake XML (v2) and JSON (v3) APIs. If you need to support the ancient Hoptoad / Airbrake v1 API, use the `redmine_hoptoad_server` plugin instead.
+This is a complete rewrite of the
+[redmine_hoptoad_server](https://github.com/jkraemer/redmine_hoptoad_server)
+plugin. It supports the Airbrake XML (v2) and JSON (v3) APIs. If you need to
+support the ancient Hoptoad / Airbrake v1 API, use the redmine\_hoptoad\_server
+plugin instead.
 
 Plugin setup
 ------------
@@ -60,7 +64,7 @@ supply the necessary configuration like this:
 
 ### Airbrake v2 (XML API)
 
-This applies e.g. to the Ruby airbrake gem, version < 5.0:
+This applies e.g. to the Ruby airbrake gem in versions < 5.0:
 
     Airbrake.configure do |config|
       config.api_key = {
@@ -79,15 +83,16 @@ This applies e.g. to the Ruby airbrake gem, version < 5.0:
     end
 
 
-### Airbrake v3 (JSON API)_
+### Airbrake v3 (JSON API)
 
-This applies if you're using the airbrake gem version >= 5.0.
+For example with the airbrake gem >= 5.0:
 
     Airbrake.configure do |config|
-      config.project_id = 'redmine_project_identifier',
+      config.project_id = 1234
       config.project_key = {
-        :tracker => 'Bug',
-        :api_key => 'my_redmine_api_key',
+        tracker: 'Bug',
+        api_key: 'my_redmine_api_key',
+        project: 'project_identifier',
         # ... other redmine_airbrake configuration options as above
       }.to_json
       config.host = 'https://my_redmine_host.com/'
@@ -95,14 +100,16 @@ This applies if you're using the airbrake gem version >= 5.0.
     end
 
 As you can see the major difference is that there is now a `project_id` and
-`projec_key` where we just had an `api_key` before. Also setting the target
-host (that's your Redmine running this plugin) has become much simpler - just
-put a complete URL into the `host` field and you're done. The `root_directory`
-Airbrake option shortens backtrace lines by replacing your projects
-installation directory with `[PROJECT_ROOT]`
+`projec_key` where we just had an `api_key` before. Set the `project_id` to any
+number, it is ignored by this plugin but validated by the Airbrake client.
+
+Setting the target host (that's your Redmine running this plugin) has become
+much simpler - just put a complete URL into the `host` field and you're done.
+The `root_directory` Airbrake option shortens backtrace lines by replacing your
+projects installation directory with `[PROJECT_ROOT]`
 
 
-Congratulations. You can now start receiving your Exceptions in Redmine!
+Congratulations. You can now start receiving exceptions in Redmine!
 
 
 ### More Configuration (please read on!)
