@@ -28,6 +28,10 @@ class AirbrakeNoticesControllerTest < ActionController::TestCase
     v2_test load_fixture('v2_yaml_message.xml')
   end
 
+  test 'should create an issue with journal entry for a v2 request with yaml config with symbol keys' do
+    v2_test load_fixture('v2_yaml_symbols_message.xml')
+  end
+
 
   def v2_test(data)
     with_settings mail_handler_api_key: 'foobar' do

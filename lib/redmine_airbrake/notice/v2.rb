@@ -8,8 +8,9 @@ module RedmineAirbrake
         cfg = xml.xpath('//api-key').first.content rescue ''
         @config = JSON.parse(cfg) rescue {}
         if @config.blank? && defined? SafeYAML
-          @config = SafeYAML.load cfg
+          @config = Hash[SafeYAML.load(cfg).map{|k,v| [k.to_s.sub( /\A:/,''), v]}]
         end
+
 
         @errors = []
         xml.xpath('//error').each do |e|
