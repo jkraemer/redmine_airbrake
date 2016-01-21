@@ -20,7 +20,7 @@ module RedmineAirbrake
       def occurences
         @occurences ||= issue_custom_field_for '# Occurences', {
           field_format: 'int',
-          default_value: 0,
+          default_value: '0', # it has to be a string otherwise 2.6 fails
           is_filter: true
         }
       end
