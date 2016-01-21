@@ -56,7 +56,11 @@ module RedmineAirbrake
 
           # reopen issue if needed
           if issue.status.blank? or issue.status.is_closed?
-            issue.status = IssueStatus.default
+            issue.status = if Redmine::VERSION::MAJOR < 3
+                             IssueStatus.default
+                           else
+                             issue.tracker.default_status
+                           end
           end
 
           issue.save!
