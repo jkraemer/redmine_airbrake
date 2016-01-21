@@ -50,7 +50,7 @@ module RedmineAirbrake
       private
 
       def format_section(name, data)
-        "\n\nh4. #{name}\n\n<pre>\n#{data}\n</pre>\n" unless data.blank?
+        "h4. #{name}\n\n<pre>\n#{data}\n</pre>\n\n" unless data.blank?
       end
     end
 
@@ -58,7 +58,7 @@ module RedmineAirbrake
       private
 
       def format_section(name, data)
-        "\n\n#### #{name}\n\n#{indent data}\n" unless data.blank?
+        "#### #{name}\n\n#{indent data}\n\n" unless data.blank?
       end
 
       def indent(string)
