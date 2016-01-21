@@ -11,6 +11,8 @@ plugin. It supports the Airbrake XML (v2) and JSON (v3) APIs. If you need to
 support the ancient Hoptoad / Airbrake v1 API, use the redmine\_hoptoad\_server
 plugin instead.
 
+Supports Redmine from 2.6 onwards.
+
 Plugin setup
 ------------
 
