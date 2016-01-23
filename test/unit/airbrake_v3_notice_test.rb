@@ -9,6 +9,19 @@ class AirbrakeV3NoticeTest < ActiveSupport::TestCase
     assert_match(/ in /, s)
   end
 
+  test 'should not produce subject longer than 255 chars' do
+    e = RedmineAirbrake::Error.new({}, @notice)
+    e.stubs(:error_class).returns "RuntimeError"
+    e.stubs(:line).returns({
+      'file' => '/123456789'*24 + '/very/deeply/nested.rb',
+      'line' => 12
+    })
+    @notice.stubs(:error).returns(e)
+    assert s = @notice.subject
+    assert_equal 255, s.length
+    assert_match /\A\[staging\] Runtime.+nested\.rb:12\z/, s
+  end
+
   test 'should compute description' do
     assert d = @notice.description
     assert_match(/Airbrake Notifier reported/, d)

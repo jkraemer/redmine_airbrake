@@ -11,7 +11,6 @@ module RedmineAirbrake
           @config = Hash[SafeYAML.load(cfg).map{|k,v| [k.to_s.sub( /\A:/,''), v]}]
         end
 
-
         @errors = []
         xml.xpath('//error').each do |e|
           @errors << build_error(e)

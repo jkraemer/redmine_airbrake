@@ -116,18 +116,23 @@ Congratulations. You can now start receiving exceptions in Redmine!
 
 ### More Configuration (please read on!)
 
-After you received your first exception in Redmine, you will notice two new
-custom fields in the project(s) you've received the exceptions for. Those are
-*Backtrace filter* and *Repository root*.
+After you received the first exception in a Redmine project, you will notice
+two new project custom fields here. Those are *Backtrace filter* and
+*Repository root*.
 
 #### Backtrace filter
 
 If you'd like to (and we really recommend you do!) filter the backtraces that
-Notifier reports, you can add comma separated strings to that field. Every line
-in a backtrace will be scanned against those strings and matching lines *will
-be removed*. I usually set my filter to `[GEM_ROOT]`, but if you're using
-plugins which tend to clutter up your backtraces, you might want to include
-those as well. Like this for example: `[GEM_ROOT],[RAILS_ROOT]/vendor/plugins/newrelic_rpm`.
+are shown in the journal entries created by this plugin, you can set this field
+to a list of expressions (one per line) to be filtered out to that field.
+The filtered backtrace will only contain frames from locations not matching any
+of these expressions.
+
+I usually simply set my filter to `[GEM_ROOT]` so the filtered backtrace only
+contains frames in code that's _not_ part of any Ruby gems, but if you find
+other code cluttering up your backtraces, you might want to include
+those source files as well.
+
 
 #### Repository root
 

@@ -24,12 +24,19 @@ class ErrorTest < ActiveSupport::TestCase
     assert @error.line.present?
   end
 
-  test 'should have filtered back trace' do
-    @error.stubs(:project_trace_filter).returns(['GEM_ROOT'])
+  test 'should not have filtered backtrace when no filters are present' do
+    @error.stubs(:project_trace_filter).returns(nil)
+    assert_nil @error.filtered_backtrace
+  end
+
+  test 'should have filtered backtrace' do
+    @error.stubs(:project_trace_filter).returns(['[GEM_ROOT]','foo'])
     assert backtrace = @error.backtrace
+    assert backtrace.any?
+    assert backtrace.any?{|frame| frame['file'] =~ /GEM_ROOT/}
     assert f_backtrace = @error.filtered_backtrace
-    assert f_backtrace.size > 0
-    assert f_backtrace.size < backtrace.size
+    assert f_backtrace.any?
+    assert !f_backtrace.any?{|frame| frame['file'] =~ /GEM_ROOT/}
   end
 
 end

@@ -21,28 +21,34 @@ module RedmineAirbrake
     end
 
     def backtrace
-      data['backtrace']
+      @backtrace ||= data['backtrace'].compact
     end
 
     def filtered_backtrace
-      @filtered_backtrace ||= filter_backtrace backtrace
+      unless project_trace_filter.blank?
+        @filtered_backtrace ||= filter_backtrace backtrace
+      end
     end
 
+    # returns the first frame from the backtrace that's below PROJECT_ROOT (for
+    # source linking)
     def line
-      filtered_backtrace.first
+      (filtered_backtrace || backtrace).detect do |frame|
+        frame['file'] =~ /\A\[PROJECT_ROOT\]/
+      end
     end
 
     private
 
     def project_trace_filter
-      notice.project.custom_value_for(CustomFields.trace_filter).value.split(/[,\s\n\r]+/) rescue []
+      @project_trace_filter ||= @notice.project.custom_value_for(CustomFields.trace_filter).value.lines.map(&:strip) rescue []
     end
 
     def filter_backtrace(backtrace)
       trace_filters = TRACE_FILTERS + project_trace_filter
-      backtrace.reject do |line|
-        file = line['file']
-        file.blank? || trace_filters.any?{|expr| file.scan(expr).any?}
+      backtrace.reject do |frame|
+        file = frame['file']
+        file.blank? || trace_filters.any?{|expr| file[expr]}
       end
     end
 

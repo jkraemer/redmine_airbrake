@@ -81,12 +81,21 @@ module RedmineAirbrake
         errors.first
       end
 
+      def cleanup_path(path)
+        path.sub(/\A\[[A-Z]+_ROOT\]\//, '')
+      end
+
       # issue subject
       def subject
         (environment.present? ? "[#{environment}] " : "").tap do |subj|
           subj << error.error_class
           if l = error.line
-            subj << " in #{cleanup_path(l['file'])[0,(250-subj.length)]}:#{l['line']}"
+            path = cleanup_path(l['file'])
+            path_len = 247 - (subj.length + l['line'].to_s.length)
+            if path.length > path_len
+              path = "...#{path[-1*path_len, path_len]}"
+            end
+            subj << " in #{path}:#{l['line']}"
           end
         end
       end
@@ -149,12 +158,6 @@ module RedmineAirbrake
       def error_message
         error.message
       end
-
-      def cleanup_path(path)
-        path.sub(/\[(PROJECT|RAILS)_ROOT\]\//,'')
-      end
-
-
 
     end
 
