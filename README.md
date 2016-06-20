@@ -91,19 +91,20 @@ For example with the airbrake gem >= 5.0:
 
     Airbrake.configure do |config|
       config.project_id = 1234
-      config.project_key = {
+      config.project_key = CGI.escape({
         tracker: 'Bug',
         api_key: 'my_redmine_api_key',
         project: 'project_identifier',
         # ... other redmine_airbrake configuration options as above
-      }.to_json
+      }.to_json)
       config.host = 'https://my_redmine_host.com/'
       config.root_directory = Rails.root.to_s
     end
 
 As you can see the major difference is that there is now a `project_id` and
 `projec_key` where we just had an `api_key` before. Set the `project_id` to any
-number, it is ignored by this plugin but validated by the Airbrake client.
+number, it is ignored by this plugin but validated by the Airbrake client. The
+`project_key` will be used as a URL parameter so it should be escaped properly.
 
 Setting the target host (that's your Redmine running this plugin) has become
 much simpler - just put a complete URL into the `host` field and you're done.
