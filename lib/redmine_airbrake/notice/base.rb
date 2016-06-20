@@ -17,8 +17,18 @@ module RedmineAirbrake
                                    project_id: project.id,
                                    tracker_id: tracker.id,
                                    author_id: author.id).first
-          # new issue
+          # create a new issue
+
           CustomFields.ensure_fields_on_tracker_and_project tracker, project
+
+          cf_values = {
+            CustomFields.error_class.id => error.error_class,
+            CustomFields.occurences.id => 0 # will be incremented later
+          }
+          if environment.present?
+            cf_values[CustomFields.environment.id] = environment
+          end
+
           issue = Issue.new project:     project,
                             tracker:     tracker,
                             author:      author,
@@ -26,25 +36,17 @@ module RedmineAirbrake
                             category:    category,
                             priority:    priority,
                             subject:     subject,
-                            description: description
+                            description: description,
+                            custom_field_values: cf_values
 
-          # set custom field error class
-          issue.custom_values.build(custom_field: CustomFields.error_class,
-                                    value: error.error_class)
-          if environment.present?
-            issue.custom_values.build(custom_field: CustomFields.environment,
-                                      value: environment)
+          # do not send mails right now
+          ::Mailer.with_deliveries(false) do
+            issue.save!
           end
-          issue.notify = false # do not send mails right now
-          issue.save!
         end
 
-        # increment occurences custom field
         if value = issue.custom_value_for(CustomFields.occurences)
           value.update_attribute :value, (value.value.to_i + 1).to_s
-        else
-          issue.custom_values.create!(custom_field: CustomFields.occurences,
-                                      value: 1)
         end
 
         # create the journal entry, update issue attributes
