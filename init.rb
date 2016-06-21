@@ -10,6 +10,3 @@ Redmine::Plugin.register :redmine_airbrake do
   requires_redmine :version_or_higher => '2.6.0'
 end
 
-Rails.configuration.to_prepare do
-end
-
