@@ -113,7 +113,7 @@ class AirbrakeNoticesControllerTest < ActionController::TestCase
     def initialize(testcase)
       @testcase = testcase
     end
-    def send(notice)
+    def send(notice, *_)
       @testcase.airbrake_notice = notice
     end
   end
