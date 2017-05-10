@@ -34,7 +34,7 @@ module RedmineAirbrake
       private
 
       def format_hash(hash)
-        PP.pp hash, "" if hash
+        PP.pp(hash, "").chomp if hash
       end
 
       def format_backtrace(lines)
