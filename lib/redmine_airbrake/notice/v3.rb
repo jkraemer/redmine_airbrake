@@ -13,7 +13,9 @@ module RedmineAirbrake
           end
         end
 
-        @request = @data['params']
+        if @request = @data['params']
+          @request.delete 'thread' # newer airbrakes put a lot of stuff in there
+        end
         @session = @data['session']
         @env = @data['environment']
         @env['context'] = @data['context']
