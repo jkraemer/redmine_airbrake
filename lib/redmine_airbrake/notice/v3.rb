@@ -3,9 +3,18 @@ module RedmineAirbrake
 
     class V3 < Base
 
-      def initialize(data, config)
+      def initialize(data, config = nil)
         @config = config
         @data = JSON.parse data
+
+        @env = @data['environment']
+
+        if ctx = @data['context']
+          if config = ctx.delete('redmine_config')
+            @config = config
+          end
+          @env['context'] = ctx
+        end
 
         if errors = @data['errors']
           @errors = errors.map do |e|
@@ -17,8 +26,6 @@ module RedmineAirbrake
           @request.delete 'thread' # newer airbrakes put a lot of stuff in there
         end
         @session = @data['session']
-        @env = @data['environment']
-        @env['context'] = @data['context']
 
       end
 

@@ -85,6 +85,18 @@ class AirbrakeNoticesControllerTest < ActionController::TestCase
     assert_equal('2', occurences_value.value)
   end
 
+  test 'should handle config as context parameters' do
+    params = airbrake_params
+    params.delete :key
+    assert_difference "Issue.count", 1 do
+      assert_difference "Journal.count", 1 do
+        raw_post :create, params, create_error_no_key
+      end
+    end
+    assert_response :success
+  end
+
+
   test "should render error for non existing project" do
     assert_no_difference "Issue.count" do
       assert_no_difference "Journal.count" do
@@ -118,6 +130,17 @@ class AirbrakeNoticesControllerTest < ActionController::TestCase
     end
   end
 
+  # simulates an error submitted with the redmine config as art of the notice
+  # context and not the project_key
+  def create_error_no_key(cfg = {})
+    raise 'test'
+  rescue
+    Airbrake::Notifier.new(project_id: 1234, project_key: 'secret', root_directory: Rails.root.to_s).send(:send_notice, $!, {}, TestSender.new(self))
+
+    @airbrake_notice[:context][:redmine_config] = DEFAULT_CONFIG
+    return @airbrake_notice.to_json
+  end
+
   def create_error(cfg = {})
     raise 'test'
   rescue
@@ -125,12 +148,14 @@ class AirbrakeNoticesControllerTest < ActionController::TestCase
     return @airbrake_notice.to_json
   end
 
+  DEFAULT_CONFIG = {
+    project: 'ecookbook',
+    tracker: 'Bug',
+    api_key: 'asdfghjk',
+  }
+
   def config(cfg)
-    {
-      project: 'ecookbook',
-      tracker: 'Bug',
-      api_key: 'asdfghjk',
-    }.merge(cfg).to_json
+    DEFAULT_CONFIG.merge(cfg).to_json
   end
 
 end

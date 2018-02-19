@@ -40,7 +40,9 @@ class AirbrakeNoticesController < ActionController::Base
     when 2
       RedmineAirbrake::Notice::V2.new request.raw_post
     when 3
-      config = JSON.parse params[:key]
+      if config = params[:key]
+        config = JSON.parse config
+      end
       RedmineAirbrake::Notice::V3.new request.raw_post, config
     else
       render text: 'unsupported API version',

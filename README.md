@@ -26,11 +26,8 @@ generate an API key.
 Client configuration
 --------------------
 
-
 In order to work properly, the plugin needs some data supplied by the client.
-Since the Airbrake client is not designed to handle arbitrary parameters, we
-trick it by setting the API-Key value to a JSON-encoded hash holding our
-configuration. This hash may hold the following keys:
+This data is supplied as a hash with the following keys:
 
 project
 : Redmine project identifier where issues should be created
@@ -66,6 +63,10 @@ supply the necessary configuration like this:
 
 ### Airbrake v2 (XML API)
 
+Since the Airbrake client is not designed to handle arbitrary parameters, we
+trick it by setting the API-Key value to a JSON-encoded hash holding our
+configuration. This hash may hold the following keys:
+
 This applies e.g. to the Ruby airbrake gem in versions < 5.0:
 
     Airbrake.configure do |config|
@@ -87,7 +88,38 @@ This applies e.g. to the Ruby airbrake gem in versions < 5.0:
 
 ### Airbrake v3 (JSON API)
 
-For example with the airbrake gem >= 5.0:
+This will work with i.e. the airbrake-ruby client library from version 5
+onwards.
+
+Set up a filter that adds the config hash to the Airbrake notification before
+it gets sent:
+
+    Airbrake.configure do |config|
+      config.project_id = 1234
+      config.project_key = 'secret'
+      config.host = 'https://my_redmine_host.com/'
+      config.root_directory = Rails.root.to_s
+    end
+
+    Airbrake.add_filter do |notice|
+      notice[:context][:redmine_config] = {
+        tracker: 'Bug',
+        api_key: 'my_redmine_api_key',
+        project: 'project_identifier',
+        # ... other redmine_airbrake configuration options as above
+      }
+    end
+
+The values for `project_id` and `project_key` are completely arbitrary and not
+used anywhere, they just need to be set to make the client lib happy.
+
+
+#### Deprecated: Transmit config via project-key
+
+This does not work with recent (as of January 2018) versions of the airbrake
+client library. Since the filter-based method above that was intruced because
+of that should work in all cases, this is left in here mainly for historical
+reasons:
 
     Airbrake.configure do |config|
       config.project_id = 1234

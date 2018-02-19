@@ -2,12 +2,21 @@ require File.expand_path('../../test_helper', __FILE__)
 
 class AirbrakeV3NoticeTest < ActiveSupport::TestCase
 
+  CONFIG = { 'environment' => 'staging',
+             'project' => 'ecookbook',
+             'api_key' => 'foobar',
+             'tracker' => 'Exception',
+             'priority' => 5,
+             'repository_root' => '/some/path'
+           }
+
   test 'should compute subject' do
     assert s = @notice.subject
     assert_match(/staging/, s)
     assert_match(/RuntimeError/, s)
     assert_match(/ in /, s)
   end
+
 
   test 'should not produce subject longer than 255 chars' do
     e = RedmineAirbrake::Error.new({}, @notice)
@@ -59,6 +68,21 @@ class AirbrakeV3NoticeTest < ActiveSupport::TestCase
     assert_equal('/some/path', params['repository_root'])
   end
 
+  # this is the new style way to submit the config
+  test 'should extract redmine params from payload' do
+    config = nil
+    payload = JSON.parse load_fixture('v3_message.json')
+    payload['context']['redmine_config'] = CONFIG
+    @notice = RedmineAirbrake::Notice::V3.new(JSON.dump(payload), config)
+    assert params = @notice.config
+    assert_equal('Exception', params['tracker'], params.inspect)
+    assert_equal('staging', params['environment'])
+    assert_equal(5, params['priority'])
+    assert_equal('ecookbook', params['project'])
+    assert_equal('foobar', params['api_key'])
+    assert_equal('/some/path', params['repository_root'])
+  end
+
   test 'should parse error' do
     assert_equal 1, @notice.errors.size
     assert error = @notice.errors.first
@@ -74,14 +98,7 @@ class AirbrakeV3NoticeTest < ActiveSupport::TestCase
 
   def setup
     @notice = RedmineAirbrake::Notice::V3.new(
-      load_fixture('v3_message.json'),
-      { 'environment' => 'staging',
-        'project' => 'ecookbook',
-        'api_key' => 'foobar',
-        'tracker' => 'Exception',
-        'priority' => 5,
-        'repository_root' => '/some/path'
-      }
+      load_fixture('v3_message.json'), CONFIG
     )
   end
 
