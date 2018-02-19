@@ -61,7 +61,60 @@ Set up the Airbrake client according to the docs found at http://airbrake.io.
 When it comes to configuring the client, deviate from the instructions and
 supply the necessary configuration like this:
 
-### Airbrake v2 (XML API)
+
+### Airbrake v3 (JSON API)
+
+This will work with any current Airbrake client, i.e. the airbrake-ruby client
+library from version 5 onwards.
+
+Set up a filter that adds the config hash to the Airbrake notification before
+it gets sent:
+
+    Airbrake.configure do |config|
+      config.project_id = 1234
+      config.project_key = 'secret'
+      config.host = 'https://my_redmine_host.com/'
+      config.root_directory = Rails.root.to_s
+    end
+
+    Airbrake.add_filter do |notice|
+      notice[:context][:redmine_config] = {
+        tracker: 'Bug',
+        api_key: 'my_redmine_api_key',
+        project: 'project_identifier',
+        # ... other redmine_airbrake configuration options as above
+      }
+    end
+
+Set the `project_id` to any number, it is ignored by this plugin but validated
+by the Airbrake client. The same is true for the `project_key` string.
+
+The `root_directory` Airbrake option shortens backtrace lines by replacing your
+projects installation directory with `[PROJECT_ROOT]`
+
+
+Congratulations. You can now start receiving exceptions in Redmine!
+
+#### Deprecated: Transmit config via project-key
+
+This does not work with recent (as of January 2018) versions of the airbrake
+client library. Since the filter-based method above that was intruced because
+of that should work in all cases, this is left in here mainly for historical
+reasons:
+
+    Airbrake.configure do |config|
+      config.project_id = 1234
+      config.project_key = CGI.escape({
+        tracker: 'Bug',
+        api_key: 'my_redmine_api_key',
+        project: 'project_identifier',
+        # ... other redmine_airbrake configuration options as above
+      }.to_json)
+      config.host = 'https://my_redmine_host.com/'
+      config.root_directory = Rails.root.to_s
+    end
+
+#### Deprecated: Airbrake v2 (XML API)
 
 Since the Airbrake client is not designed to handle arbitrary parameters, we
 trick it by setting the API-Key value to a JSON-encoded hash holding our
@@ -85,66 +138,10 @@ This applies e.g. to the Ruby airbrake gem in versions < 5.0:
       config.secure = true                # sends data to your server via SSL (optional.)
     end
 
-
-### Airbrake v3 (JSON API)
-
-This will work with i.e. the airbrake-ruby client library from version 5
-onwards.
-
-Set up a filter that adds the config hash to the Airbrake notification before
-it gets sent:
-
-    Airbrake.configure do |config|
-      config.project_id = 1234
-      config.project_key = 'secret'
-      config.host = 'https://my_redmine_host.com/'
-      config.root_directory = Rails.root.to_s
-    end
-
-    Airbrake.add_filter do |notice|
-      notice[:context][:redmine_config] = {
-        tracker: 'Bug',
-        api_key: 'my_redmine_api_key',
-        project: 'project_identifier',
-        # ... other redmine_airbrake configuration options as above
-      }
-    end
-
-The values for `project_id` and `project_key` are completely arbitrary and not
-used anywhere, they just need to be set to make the client lib happy.
+I will certainly drop support for this API at some point, please upgrade your
+client.
 
 
-#### Deprecated: Transmit config via project-key
-
-This does not work with recent (as of January 2018) versions of the airbrake
-client library. Since the filter-based method above that was intruced because
-of that should work in all cases, this is left in here mainly for historical
-reasons:
-
-    Airbrake.configure do |config|
-      config.project_id = 1234
-      config.project_key = CGI.escape({
-        tracker: 'Bug',
-        api_key: 'my_redmine_api_key',
-        project: 'project_identifier',
-        # ... other redmine_airbrake configuration options as above
-      }.to_json)
-      config.host = 'https://my_redmine_host.com/'
-      config.root_directory = Rails.root.to_s
-    end
-
-As you can see the major difference is that there is now a `project_id` and
-`projec_key` where we just had an `api_key` before. Set the `project_id` to any
-number, it is ignored by this plugin but validated by the Airbrake client. The
-`project_key` will be used as a URL parameter so it should be escaped properly.
-
-Setting the target host (that's your Redmine running this plugin) has become
-much simpler - just put a complete URL into the `host` field and you're done.
-The `root_directory` Airbrake option shortens backtrace lines by replacing your
-projects installation directory with `[PROJECT_ROOT]`
-
-
-Congratulations. You can now start receiving exceptions in Redmine!
 
 
 ### More Configuration (please read on!)
