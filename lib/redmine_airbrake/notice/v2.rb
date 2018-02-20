@@ -1,3 +1,8 @@
+begin
+  require 'safe_yaml'
+rescue LoadError
+end
+
 module RedmineAirbrake
   module Notice
 

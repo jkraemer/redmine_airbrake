@@ -11,13 +11,18 @@ class ActionController::TestCase
 
   def raw_post(action, params, body = '')
     @request.env['RAW_POST_DATA'] = body
-    post(action, params)
+    if Rails.version >= '5'
+      post action, params: params
+    else
+      post(action, params)
+    end
   ensure
     @request.env.delete('RAW_POST_DATA')
   end
 
 end
 
+require 'airbrake-ruby'
 Airbrake.configure do |config|
   config.project_id = 1234
   config.project_key = {
