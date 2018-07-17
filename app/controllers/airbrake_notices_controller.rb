@@ -8,7 +8,7 @@ class AirbrakeNoticesController < ActionController::Base
         if issue = notice.save
           case api_version
           when 2
-            key = Rails.version >= '5' ? :plain : :text
+            key = RedmineAirbrake.rails5? ? :plain : :text
             render status: 200,
                    key => "Received notification.\n<id>#{issue.id}</id>"
 

@@ -11,7 +11,7 @@ class ActionController::TestCase
 
   def raw_post(action, params, body = '')
     @request.env['RAW_POST_DATA'] = body
-    if Rails.version >= '5'
+    if RedmineAirbrake.rails5?
       post action, params: params
     else
       post(action, params)
