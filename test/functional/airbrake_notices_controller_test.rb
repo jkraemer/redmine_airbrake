@@ -66,9 +66,7 @@ class AirbrakeNoticesControllerTest < ActionController::TestCase
       end
     end
     assert_response :success
-    assert issue = Issue.where("subject like ?",
-                                'RuntimeError in plugins/redmine_airbrake/test/functional/airbrake_notices_controller_test.rb%'
-                              ).first
+    assert issue = Issue.where("subject like ?", "%RuntimeError%").last
     assert_equal(1, issue.journals.size)
     assert_equal(5, issue.priority_id)
     assert occurences_field = IssueCustomField.find_by_name('# Occurences')
