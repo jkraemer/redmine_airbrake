@@ -41,6 +41,17 @@ ln -sf $PATH_TO_PLUGIN plugins/$NAME_OF_PLUGIN
 mv $TESTSPACE/database.yml.travis config/database.yml
 mv $TESTSPACE/additional_environment.rb config/
 
+cat << EOF > lib/tasks/00_nowarnings.rake
+module NoWarnings
+  def define(*_)
+    self.warning = false
+    super
+  end
+end
+
+Rake::TestTask.prepend NoWarnings
+EOF
+
 # install gems
 bundle install
 
