@@ -42,6 +42,8 @@ mv $TESTSPACE/database.yml.travis config/database.yml
 mv $TESTSPACE/additional_environment.rb config/
 
 cat << EOF > lib/tasks/00_nowarnings.rake
+require 'rake/testtask'
+
 module NoWarnings
   def define(*_)
     self.warning = false
