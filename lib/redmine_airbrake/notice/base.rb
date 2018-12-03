@@ -89,7 +89,7 @@ module RedmineAirbrake
       # remove [POJECT_PATH] or [GEM_PATH] from a path
       # works also with new format /PROJECT_PATH/ or /GEM_PATH/
       def cleanup_path(path)
-        path.sub(/\A(?:\[|\/)[A-Z]+_ROOT]?\//, '')
+        path.sub(/\A[\[\/][A-Z]+_ROOT\]?\//, '')
       end
 
       # issue subject
