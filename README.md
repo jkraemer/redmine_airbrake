@@ -90,7 +90,7 @@ Set the `project_id` to any number, it is ignored by this plugin but validated
 by the Airbrake client. The same is true for the `project_key` string.
 
 The `root_directory` Airbrake option shortens backtrace lines by replacing your
-projects installation directory with `[PROJECT_ROOT]`
+projects installation directory with `[PROJECT_ROOT]` or (since [airbrake-ruby 2.9+](https://github.com/airbrake/airbrake-ruby/pull/311/commits/d6e3855a66a104162ba1beba3f1da559a80130bd) with `/PROJECT_ROOT/`)
 
 
 Congratulations. You can now start receiving exceptions in Redmine!

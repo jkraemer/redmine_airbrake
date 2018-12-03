@@ -34,7 +34,8 @@ module RedmineAirbrake
     # source linking)
     def line
       (filtered_backtrace || backtrace).detect do |frame|
-        frame['file'] =~ /\A\[PROJECT_ROOT\]/
+        # We match both the old format [PROJECT_ROOT] and the new style /PROJECT_ROOT/
+        frame['file'] =~ /\A(?:\[|\/)PROJECT_ROOT(?:\]|\/)/
       end
     end
 
