@@ -41,14 +41,20 @@ class AirbrakeNoticesController < ActionController::Base
     when 2
       RedmineAirbrake::Notice::V2.new request.raw_post
     when 3
-      if config = params[:key]
-        config = JSON.parse config
-      end
-      RedmineAirbrake::Notice::V3.new request.raw_post, config
+      RedmineAirbrake::Notice::V3.new request.raw_post, find_v3_config
     else
       render text: 'unsupported API version',
              status: 404 and return false
     end
   end
 
+  def find_v3_config
+    unless config = params[:key].presence
+      if config = request.headers["Authorization"].presence
+        config.sub!(/\ABearer /, '')
+        config = CGI.unescape config
+      end
+    end
+    JSON.parse config if config
+  end
 end
