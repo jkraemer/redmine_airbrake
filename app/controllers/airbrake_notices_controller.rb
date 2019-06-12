@@ -56,5 +56,7 @@ class AirbrakeNoticesController < ActionController::Base
       end
     end
     JSON.parse config if config
+  rescue JSON::ParserError
+    nil
   end
 end
