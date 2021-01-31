@@ -81,7 +81,11 @@ module RedmineAirbrake
         false
       end
 
-      # technically errors is an array, but in practice there's only one.
+      # errors is an array holding the exception's `cause` chain. First is the
+      # exception we're handling, last the most inner one (up to a level of 3,
+      # that's hardcoded in airbrake-ruby's NestedException)
+      #
+      # Any nested exceptions are appended to the journal text.
       def error
         errors.first
       end

@@ -18,15 +18,26 @@ module RedmineAirbrake
         @filtered_backtrace = error.filtered_backtrace
       end
 
+      def nested_errors
+        @notice.errors[1..-1]
+      end
+
       def text
-        [
+        elements = [
           ["Error message",      @error.message],
           ["Filtered backtrace", format_backtrace(@error.filtered_backtrace)],
           ["Request",            format_hash(@notice.request)],
           ["Session",            format_hash(@notice.session)],
           ["Environment",        format_hash(@notice.env)],
           ["Full backtrace",     format_backtrace(@error.backtrace)],
-        ].map do |name, data|
+        ]
+        nested_errors.each do |error|
+          elements += [
+            ["Caused by", "#{error.error_class}: #{error.message}"],
+            ["Full backtrace", format_backtrace(error.backtrace)],
+          ]
+        end
+        elements.map do |name, data|
           format_section name, data
         end.join
       end

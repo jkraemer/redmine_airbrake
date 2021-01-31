@@ -96,6 +96,18 @@ class AirbrakeV3NoticeTest < ActiveSupport::TestCase
     assert_equal('create_error', l['function'])
   end
 
+  test 'should handle multiple errors' do
+    notice = RedmineAirbrake::Notice::V3.new(
+      load_fixture('v3_nested.json'), CONFIG
+    )
+    assert_equal 2, notice.errors.size
+    with_settings text_formatting: 'markdown' do
+      assert t = notice.journal_text
+      assert_match /Caused by/, t
+      assert_match /OtherError: inner error message/, t
+    end
+  end
+
   def setup
     @notice = RedmineAirbrake::Notice::V3.new(
       load_fixture('v3_message.json'), CONFIG
