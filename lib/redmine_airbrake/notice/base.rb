@@ -2,11 +2,13 @@ module RedmineAirbrake
   module Notice
 
     class Base
+      include ActiveSupport::SecurityUtils
+
       attr_reader :config, :errors, :env, :request, :session
 
       def api_key_valid?
         key = config['api_key']
-        key.present? and key == Setting.mail_handler_api_key
+        key.present? && secure_compare(key.to_s, Setting.mail_handler_api_key.to_s)
       end
 
       # creates / updates the issue
@@ -174,4 +176,3 @@ module RedmineAirbrake
 
   end
 end
-
