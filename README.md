@@ -185,8 +185,6 @@ requests.
 
 [airbrake-ruby](https://github.com/airbrake/airbrake-ruby) for tests.
 
-If you need to parse requests using yaml encoded options as they were used with the [redmine_hoptoad_server](https://github.com/jkraemer/redmine_hoptoad_server) plugin, add the [Safe YAML](https://github.com/dtao/safe_yaml) gem to your Redmine's `Gemfile.local`.
-
 
 License
 -------

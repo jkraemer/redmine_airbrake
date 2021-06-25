@@ -1,20 +1,27 @@
-begin
-  require 'safe_yaml'
-rescue LoadError
-end
+require 'psych'
 
 module RedmineAirbrake
   module Notice
 
     class V2 < Base
 
+      def self.load_config(string)
+        return {} if string.blank?
+
+        config = JSON.parse(string) rescue {}
+        if config.blank?
+          config = Psych.safe_load(
+            string,
+            permitted_classes: [Symbol],
+            permitted_symbols: %i[project tracker api_key category assigned_to author priority environment repository_root]).stringify_keys
+        end
+        config
+      end
+
       def initialize(data)
         xml = Nokogiri::XML(data)
         cfg = xml.xpath('//api-key').first.content rescue ''
-        @config = JSON.parse(cfg) rescue {}
-        if @config.blank? && defined? SafeYAML
-          @config = Hash[SafeYAML.load(cfg).map{|k,v| [k.to_s.sub( /\A:/,''), v]}]
-        end
+        @config = self.class.load_config cfg
 
         @errors = []
         xml.xpath('//error').each do |e|
