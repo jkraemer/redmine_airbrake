@@ -5,12 +5,18 @@ module RedmineAirbrake
 
     class V2 < Base
 
+      # in some constellations, symbols are not parsed as symbols but
+      # instead, keys keep the leading ':'. We normalize that here
+      def self.normalize_yaml_keys(hash)
+        Hash[hash.map{|k,v| [k.sub(/\A:/,''), v]}]
+      end
+
       def self.load_config(string)
         return {} if string.blank?
 
         config = JSON.parse(string) rescue {}
         if config.blank?
-          config = Psych.safe_load(
+          config = normalize_yaml_keys Psych.safe_load(
             string,
             permitted_classes: [Symbol],
             permitted_symbols: %i[project tracker api_key category assigned_to author priority environment repository_root]).stringify_keys
