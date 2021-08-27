@@ -178,6 +178,22 @@ override this setting with a custom value. This is helful in case you have
 multiple applications in the same repository reporting errors to the same
 Redmine project.
 
+
+#### Turn off performance reporting
+
+According to #5, the Airbrake client from 4.5 onwards has more reporting features
+which lead to requests this plugin cannot handle. You can turn this off in your
+Airbrake config:
+
+~~~~ruby
+Airbrake.configure do |config|
+  # ...
+  config.performance_stats = false
+  config.query_stats = false
+end
+~~~~
+
+
 #### Dependencies
 
 [Nokogiri](https://github.com/sparklemotion/nokogiri) For parsing V2 XML
