@@ -1,4 +1,4 @@
-Redmine Airbrake Plugin [![Build Status](https://travis-ci.org/jkraemer/redmine_airbrake.svg?branch=master)](https://travis-ci.org/jkraemer/redmine_airbrake)
+Redmine Airbrake Plugin [![Test with Redmine](https://github.com/jkraemer/redmine_airbrake/actions/workflows/redmine.yml/badge.svg)](https://github.com/jkraemer/redmine_airbrake/actions/workflows/redmine.yml)
 ==============
 
 This plugin makes Redmine act like an [Airbrake](http://airbrake.io/)
